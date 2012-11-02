@@ -18,9 +18,6 @@ if(sysctl_path)
   template sysctl_path do
     source 'sysctl.conf.erb'
     mode '0644'
-    variables(
-      :attrs => node[:sysctl]
-    )
     notifies :start, resources(:service => 'procps')
   end
 end
