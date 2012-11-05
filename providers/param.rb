@@ -4,7 +4,8 @@ end
 
 action :apply do
   key_path = new_resource.key.split('.')
-  location = key_path.slice(0, key_path.size - 1).inject(node[:sysctl][:attributes]) do |m,o|
+  sys_attrs = Mash.new(node[:sysctl][:attributes].to_hash)
+  location = key_path.slice(0, key_path.size - 1).inject(sys_attrs) do |m,o|
     m[o] ||= {}
     m[o]
   end
@@ -16,13 +17,15 @@ action :apply do
         %x{sysctl -n #{new_resource.key}}.strip == new_resource.value.to_s
       end
     end
+    node.set[:sysctl][:attributes] = sys_attrs
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :remove do
   key_path = new_resource.key.split('.')
-  location = key_path.slice(0, key_path.size - 1).inject(node[:sysctl][:attributes]) do |m,o|
+  sys_attrs = Mash.new(node[:sysctl][:attributes].to_hash)
+  location = key_path.slice(0, key_path.size - 1).inject(sys_attrs) do |m,o|
     m.nil? ? nil : m[o]
   end
   if(location && location[key_path.last])
@@ -38,6 +41,7 @@ action :remove do
         end
       end
     end
+    node.set[:sysctl][:attributes] = sys_attrs
     new_resource.updated_by_last_action(true)
   end
 end
