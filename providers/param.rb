@@ -10,7 +10,7 @@ action :apply do
     m[o]
   end
   unless(location[key_path.last] == new_resource.value)
-    location[key_path.last] = new_resource.value
+    # location[key_path.last] = new_resource.value
     execute "sysctl[#{new_resource.key}]" do
       command "sysctl -w #{new_resource.key}=#{new_resource.value}"
       not_if do
